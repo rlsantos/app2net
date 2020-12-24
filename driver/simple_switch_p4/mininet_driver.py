@@ -1,6 +1,8 @@
 import logging
 import os
+import sys
 import tempfile
+import threading
 from server import MessageServer
 
 from mininet.node import Switch
@@ -16,15 +18,17 @@ class SimpleSwitch(Switch):
         cmd = ["simple_switch_grpc"]
         for port, intf in self.intfs.items():
             if not intf.IP():
-                cmd.extend(['-i', str(port) + "@" + intf.name])
-        
+                k = ['-i', str(port) + "@" + intf.name]
+                print(k)
+                cmd.extend(k)
+
         if self.software_path is None:
             cmd.append("--no-p4")
         else:
             cmd.append(self.software_path)
 
         with tempfile.NamedTemporaryFile() as f:
-            self.cmd(" ".join(cmd) + " >logs/switch.log" + "2>&1 & echo $! >> " + f.name)
+            self.cmd(" ".join(cmd) + " >logs/switch.log " + " >&1 & echo $! >> " + f.name)
             pid = int(f.read())
         print(f"Running PID: {pid}")
 
@@ -43,7 +47,9 @@ class SimpleSwitchDriver(Switch):
         self.switch_args = kwargs
         self.server = None
         self.logger = logging.getLogger("MININET_DRIVER")
-        self.logger.addHandler(logging.FileHandler("logs/mininet_driver.log"))
+        file_handler = logging.FileHandler("logs/mininet_driver.log")
+        file_handler.setFormatter(logging.Formatter("[%(asctime)s] %(name)s: %(message)s"))
+        self.logger.addHandler(file_handler)
         self.logger.setLevel(logging.INFO)
         
         self.logger.info("[DRIVER] Initializing driver... ")
@@ -112,6 +118,7 @@ class SimpleSwitchDriver(Switch):
 
 if __name__ == "__main__":
     from mininet.net import Mininet, CLI
+    from MiniNAM import MiniNAM
 
     net = Mininet()
     h1 = net.addHost("h1", ip="10.0.1.1/24", mac="08:00:00:00:01:01")
@@ -132,4 +139,6 @@ if __name__ == "__main__":
         h.cmd(f"route add default gw 10.0.{i}.{i}0 dev h{i}-eth0")
         h.cmd(f"arp -i h{i}-eth0 -s 10.0.{i}.{i}0 08:00:00:00:0{i}:00")
 
+    if len(sys.argv) >= 2 and sys.argv[2] in ("--display", "-d"):
+        threading.Thread(target=MiniNAM, kwargs={'net': net}).run()
     CLI(net)

@@ -17,7 +17,6 @@ class MessageServer(threading.Thread):
         return self
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
-        print("Stopping server")
         self.stop()
         if exc_type is KeyboardInterrupt:
             return True
