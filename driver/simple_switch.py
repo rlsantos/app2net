@@ -115,7 +115,7 @@ class SimpleSwitchDriver(Driver):
         cmd = ["simple_switch_grpc"]
 
         for interface in self._interfaces:
-            args.append(f"-i {interface['port']}@{interface['name']}")
+            cmd.extend(["-i", f"{interface['port']}@{interface['name']}"])
 
         if self.netapps:
             identifier = list(self.netapps)[0]
