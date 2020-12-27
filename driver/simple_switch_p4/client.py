@@ -7,30 +7,21 @@ async def main():
         print("========== Simple Switch Driver Menu =============")
         message = input(
             "1. Instalar programa\n"
-            "2. Iniciar switch\n"
-            "3. Parar switch\n"
-            "4. Desinstalar programa\n"
-            "5. Atualizar programa\n"
-            "6. Verificar status\n"
+            "2. Desinstalar programa\n"
+            "3. Obter informações de execução\n"
         )
         
         dict_message = {}
 
         if message == "1":
-            path = input("Path to program: ")
-            dict_message["action"] = "install"
-            dict_message["path"] = path
+            dict_message["action"] = "download"
+            dict_message["uri"] = input("URI do programa: ")
+            dict_message["identifier"] = input("Identificador: ")
         elif message == "2":
-            dict_message["action"] = "start"
+            dict_message["action"] = "remove"
+            dict_message["identifier"] = input("Identificador: ")
         elif message == "3":
-            dict_message["action"] = "stop"
-        elif message == "4":
-            dict_message["action"] = "uninstall"
-        elif message == "5":
-            dict_message["action"] = "update"
-            dict_message["path"] = input("Path to program: ")
-        elif message == "6":
-            dict_message["action"] = "status"
+            dict_message["action"] = "data"
 
         reader, writer = await asyncio.open_connection("localhost", 5555)
         
