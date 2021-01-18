@@ -24,11 +24,14 @@ class MessageServer(threading.Thread):
 
     def prepare(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((self.address, self.port))
         self.sock.listen()
 
     def stop(self):
+        self.sock.shutdown(socket.SHUT_RDWR)
         self.sock.close()
+        self.sock = None
 
     def run(self):
         if self.sock is None:
@@ -40,7 +43,7 @@ class MessageServer(threading.Thread):
             response = {}
             try:
                 if data["action"] == "download":
-                    self.driver.download(data["uri"], data["identifier"])
+                    self.driver.download(data["identifier"], data["uris"])
                 elif data["action"] == "remove":
                     self.driver.remove(data["identifier"])
                 elif data["action"] == "management":
