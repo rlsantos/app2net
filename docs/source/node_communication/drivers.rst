@@ -1,7 +1,6 @@
 ====================
 Drivers
 ====================
-lalalala
 
-.. automodule:: node_communication.drivers.reference
+.. automodule:: app2net.node_communication.drivers.reference
    :members:

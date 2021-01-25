@@ -11,5 +11,5 @@ Handle communication and control of network nodes.
     drivers
 
 
-.. automodule:: node_communication.message_server
+.. automodule:: app2net.node_communication.message_server
    :members:
