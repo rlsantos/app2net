@@ -4,12 +4,12 @@ import threading
 
 
 class MessageServer(threading.Thread):
-    def __init__(self, address, port, handler, *args, **kwargs):
+    def __init__(self, address, port, driver, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setDaemon(True)
         self.address = address
         self.port = port
-        self.handler = handler
+        self.driver = driver
         self.sock = None
 
     def __enter__(self):
@@ -24,11 +24,14 @@ class MessageServer(threading.Thread):
 
     def prepare(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((self.address, self.port))
         self.sock.listen()
 
     def stop(self):
+        self.sock.shutdown(socket.SHUT_RDWR)
         self.sock.close()
+        self.sock = None
 
     def run(self):
         if self.sock is None:
@@ -37,8 +40,18 @@ class MessageServer(threading.Thread):
         while True:
             conn, _ = self.sock.accept()
             data = json.loads(conn.recv(1024).decode())
+            response = {}
             try:
-                response = self.handler(data) or "Action executed!"
+                if data["action"] == "download":
+                    self.driver.download(data["identifier"], data["uris"])
+                elif data["action"] == "remove":
+                    self.driver.remove(data["identifier"])
+                elif data["action"] == "management":
+                    self.driver.run_management_action(data["command"])
+                elif data["action"] == "data":
+                    response["data"] = self.driver.get_execution_data()
+                response["success"] = True
             except Exception as e:
-                response = str(e)
-            conn.send(response.encode())
+                response["error"] = str(e)
+                response["success"] = False
+            conn.send(json.dumps(response).encode())
