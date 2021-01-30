@@ -4,6 +4,7 @@ import os
 import shutil
 import logging
 import tarfile
+import hashlib
 
 from ..message_server import MessageServer
 from .reference import Driver
@@ -32,12 +33,14 @@ class SimpleSwitchDriver(Driver):
 
     def download(self, identifier, uri, strategy, hash):
         self._logger.info(f"Started download of NetApp '{identifier}' files")
+        
         if self.netapps:
             self._logger.warning(f"Cannot download netapp '{identifier}' files. "
                     "Switch has already an installed NetApp")
             raise EnvironmentError("There is already a NetApp installed. Please, uninstall it first")
+        
+        self.netapps.add(identifier)
 
-        self._stop()
         apps_path = self.env["APPS_PATH"]
         old_dir = os.getcwd()
         if not os.path.exists(apps_path):
@@ -53,7 +56,6 @@ class SimpleSwitchDriver(Driver):
 
         os.chdir(identifier)
 
-        
         self._logger.info(f"Downloading NetApp '{identifier}' from {uri}")
         download = subprocess.run(
             ["curl", uri, "--fail", "--silent", "--show-error", "-o", f"{identifier}.tar.gz"], 
@@ -64,52 +66,52 @@ class SimpleSwitchDriver(Driver):
             message = f"Couldn't complete download from {uri}: {download.stderr.decode()}"
             self._logger.error(message)
             raise IOError(message)
-        
+
         tar = f"{identifier}.tar.gz"
+        calculated_hash = hashlib.md5()
+
+        with open(tar, "rb") as file:
+            calculated_hash.update(file.read())
+
+        if calculated_hash.hexdigest() != hash:
+            self.remove(identifier)
+            raise ValueError(f"Package hash {calculated_hash.hexdigest()} doesn't match expected value {hash}")
+
         tarfile.open(tar).extractall(".")
         os.remove(tar)
-
-        self._logger.info(f"Compiling NetApp '{identifier}'")
-
-        compilation = subprocess.run([
-            "p4c",
-            "--target", "bmv2",
-            "--arch", "v1model",
-            "--std", "p4-16", 
-            "-o", "build/",
-            "--p4runtime-files", "build/netapp.p4runtime.txt",
-            extra_data["compilation_entry_file"]
-        ], capture_output=True)
-
-        if compilation.stderr:
-            self._logger.error(f"Couldn't compile NetApp '{identifier}': {compilation.stderr}")
-
-        compilation.check_returncode()
-        self.env["COMPILED_NETAPP"] = extra_data["compilation_entry_file"].replace(".p4", ".json")
-        self.netapps.add(identifier)
-        self.env["INSTALLED_NETAPP"] = identifier
         os.chdir(old_dir)
-        self._start()
         self._logger.info(f"Completed download of NetApp '{identifier}'")
 
     def remove(self, identifier):
         if identifier not in self.netapps:
             raise EnvironmentError(f"NetApp '{identifier}' is not installed")
+
         self._stop()
-        old_dir = os.getcwd()
+
         os.chdir(self.env["APPS_PATH"])
         shutil.rmtree(identifier)
+
         self.netapps.remove(identifier)
-        del self.env["COMPILED_NETAPP"]
-        del self.env["INSTALLED_NETAPP"]
-        os.chdir(old_dir)
+
+        if "INSTALLED_NETAPP" in self.env:
+            del self.env["INSTALLED_NETAPP"]
+        os.chdir("..")
         self._start()
 
-    def run_management_action(self, identifier, action):
+    def run_management_action(self, identifier, action, native_procedure=False):
         self._logger.info(f"Running management action '{action}'")
         old_dir = os.getcwd()
         os.chdir(os.path.join(self.env["APPS_PATH"], identifier))
-        cmd = []
+        
+        if native_procedure:
+            cmd = [
+                "p4c-bm2-ss", 
+                "--std", "p4-16", 
+                "-o", "build.json", 
+                "--p4runtime-files", "netapp.p4runtime.txt"
+            ]
+        else:
+            cmd = []
 
         for arg in action.split():
             matches = var_regex.findall(arg)
@@ -117,7 +119,14 @@ class SimpleSwitchDriver(Driver):
                 arg = arg.replace(f"${match}$", self.env.get(match))
             cmd.append(arg)
 
+        if native_procedure:
+            self._stop()
+
         p = subprocess.run(cmd, capture_output=True)
+
+        if native_procedure:
+            self.env["INSTALLED_NETAPP"] = identifier
+            self._start()
 
         os.chdir(old_dir)
 
@@ -144,7 +153,7 @@ class SimpleSwitchDriver(Driver):
 
         if self.netapps:
             identifier = list(self.netapps)[0]
-            path = os.path.join(self.env["APPS_PATH"], identifier, "build", self.env["COMPILED_NETAPP"])
+            path = os.path.join(self.env["APPS_PATH"], identifier, "build.json")
             cmd.append(path)
         else:
             cmd.append("--no-p4")

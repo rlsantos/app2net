@@ -21,17 +21,8 @@ async def main():
             if message == "1":
                 dict_message["action"] = "download"
                 dict_message["uri"] = input("URI: ")
-                dict_message["identifier"] = input("Identificador: ")
-                dict_message["extra"] = {}
-
-                n = input("Do you want to include extra data? (Y/N)").upper() == "Y"
-                counter = 1
-                while n:
-                    key = input(f"Extra data [{counter}] - key: ")
-                    value = input(f"Extra data [{counter}] - value: ")
-                    dict_message["extra"][key] = value
-                    counter += 1
-                    n = input("Do you want to include more data? (Y/N)").upper() == "Y"
+                dict_message["identifier"] = input("Identifier: ")
+                dict_message["hash"] = input("Package hash: ")
 
             elif message == "2":
                 dict_message["action"] = "remove"
@@ -44,6 +35,7 @@ async def main():
                 dict_message["action"] = "management"
                 dict_message["identifier"] = input("NetApp Identifier: ")
                 dict_message["command"] = input("Command: ")
+                dict_message["native_procedure"] = input("Native procedure? (Y/N)").upper() == "Y"
 
             reader, writer = await asyncio.open_connection(host, port)
             
