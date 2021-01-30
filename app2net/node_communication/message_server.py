@@ -75,11 +75,11 @@ class MessageServer(threading.Thread):
             }
             try:
                 if data["action"] == "download":
-                    self.driver.download(data["identifier"], data["uri"], "", **data["extra"])
+                    self.driver.download(data["identifier"], data["uri"], "", data["hash"])
                 elif data["action"] == "remove":
                     self.driver.remove(data["identifier"])
                 elif data["action"] == "management":
-                    output = self.driver.run_management_action(data["identifier"], data["command"])
+                    output = self.driver.run_management_action(data["identifier"], data["command"], data["native_procedure"])
                     if output is not None:
                          response = output
                 elif data["action"] == "data":

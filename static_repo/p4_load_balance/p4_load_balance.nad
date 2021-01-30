@@ -10,13 +10,14 @@
         <version>all</version>
         <type>netapp</type>
         <location>
-            <uri>file:///home/p4/app2net/driver/simple_switch_p4/p4_load_balance.tar.gz</uri>
+            <uri>file:///home/p4/app2net/static_repo/p4_load_balance/p4_load_balance.tar.gz</uri>
         </location>
         <hash>e7d8f4596f0341391dbbaee1eb9bffcd</hash>
         <location_flag>ingress</location_flag>
         <manage_actions>
             <install>
-                <compilation_entry_file>my_load_balance.p4<compilation_entry_file>
+                <command>my_load_balance.p4</command>
+                <native_procedure>true</native_procedure>
             </install>
         </manage_actions>
     </technology>
@@ -26,13 +27,14 @@
         <version>all</version>
         <type>netapp</type>
         <location>
-            <uri>file:///home/p4/app2net/driver/simple_switch_p4/my_load_balance.tar.gz</uri>
+            <uri>file:///home/p4/app2net/static_repo/p4_load_balance/p4_load_balance.tar.gz</uri>
         </location>
         <hash>e7d8f4596f0341391dbbaee1eb9bffcd</hash>
         <location_flag>ingress</location_flag>
         <manage_actions>
             <install>
-                <compilation_entry_file>my_load_balance.p4<compilation_entry_file>
+                <command>my_load_balance.p4</command>
+                <native_procedure>true</native_procedure>
             </install>
         </manage_actions>
     </technology>
