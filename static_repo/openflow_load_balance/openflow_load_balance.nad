@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<identifier>openflow_load_balance</identifier>
+<categories>
+    <category>load_balancing</category>
+</categories>
+<packages>
+    <technology>
+        <identifier>openflow</identifier>
+        <ee>openflow_controller</ee>
+        <version>all</version>
+        <type>netapp</type>
+        <location> <!--TODO uri-->
+            <uri></uri>
+        </location>
+        <hash>99e0324291cccf6b0860069edd8bfc64</hash>
+        <location_flag>custom</location_flag>
+        <manage_actions>
+            <install>
+                <command></command>
+                <native_procedure>false</native_procedure>
+            </install>
+            <configure>
+                <parameter>
+                    <value>mac</value>
+                    <command>python3 ./update.py --service_mac=<command/>
+                </parameter>
+                <parameter>
+                    <value>ip</value>
+                    <command>python3 ./update.py --service_ip_blue=<command/>
+                </parameter>
+                <parameter>
+                    <value>ip</value>
+                    <command>python3 ./update.py --service_ip_red=<command/>
+                </parameter>
+                <parameter>
+                    <value>ip_list</value>
+                    <command>python3 ./update.py --server_ip_blue=<command/>
+                </parameter>
+                <parameter>
+                    <value>ip_list</value>
+                    <command>python3 ./update.py --server_ip_red=<command/>
+                </parameter>
+                <parameter>
+                    <value>boolean</value>
+                    <command>python3 ./update.py --proactive_mode=<command/>
+                </parameter>
+            </configure>
+            <start>
+                <command>ryu-manager ./lb.py --test-switch-dir ./lb_config.json</command>
+                <native_procedure>false</native_procedure>
+            </start>
+            <stop>
+                <command>sudo killall -9 ryu-manager</command>
+                <native_procedure>false</native_procedure>
+            </stop>
+        </manage_actions>
+    </technology>
+</packages>
