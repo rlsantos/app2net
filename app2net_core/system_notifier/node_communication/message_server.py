@@ -75,7 +75,7 @@ class MessageServer(threading.Thread):
             }
             try:
                 if data["action"] == "download":
-                    self.driver.download(data["identifier"], data["uri"], "", data["hash"])
+                    self.driver.download(data["identifier"], data["uri"], data["strategy"], data["hash"])
                 elif data["action"] == "remove":
                     self.driver.remove(data["identifier"])
                 elif data["action"] == "management":
