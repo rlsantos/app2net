@@ -32,6 +32,8 @@ class SimpleSwitchDriver(Driver):
         self._start()
 
     def download(self, identifier, uri, strategy, hash):
+        if identifier == "":
+            raise ValueError("Identifier cannot empty")
         self._logger.info(f"Started download of NetApp '{identifier}' files")
         
         if self.netapps:
@@ -146,7 +148,7 @@ class SimpleSwitchDriver(Driver):
             return
 
         self._logger.info("Starting SimpleSwitch")
-        cmd = ["simple_switch_grpc"]
+        cmd = ["simple_switch"]
 
         for interface in self._interfaces:
             cmd.extend(["-i", f"{interface['port']}@{interface['name']}"])
@@ -176,10 +178,11 @@ class SimpleSwitchDriver(Driver):
         self._logger.info("SimpleSwitch stopped")
 
 if __name__ == "__main__":
+    BASE_DIR = os.path.dirname(__file__)
     driver = SimpleSwitchDriver(
         env={
-            "LOGS_PATH": "/home/p4/app2net/driver/simple_switch/logs",
-            "APPS_PATH": "/home/p4/app2net/driver/simple_switch/netapps",
+            "LOGS_PATH": os.path.join(BASE_DIR, "logs"),
+            "APPS_PATH": os.path.join(BASE_DIR, "netapps")
         }
     )
 

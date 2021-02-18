@@ -5,6 +5,7 @@ import subprocess
 import shutil
 import tarfile
 import hashlib
+import sys
 
 from .reference import Driver
 from ..message_server import MessageServer
@@ -31,7 +32,7 @@ class OpenFlowDriver(Driver):
         if identifier in self.netapps:
             self._logger.warning(f"Cannot download netapp {identifier} files. Already installed.")
             raise EnvironmentError("There is an already installed netapp. Please, uninstall first.")
-
+        self.netapps.add(identifier)
         base_dir = os.getcwd()
         if not os.path.exists(self.apps_path):
             self._logger.info(f"Creating directory {self.apps_path}")
@@ -72,7 +73,7 @@ class OpenFlowDriver(Driver):
         tarfile.open(tar).extractall(".")
         os.remove(tar)
         os.chdir(base_dir)
-        self.netapps.add(identifier)
+
         self._logger.info(f"Completed download of NetApp '{identifier}'")
         
     def remove(self, identifier: str):
@@ -120,10 +121,11 @@ class OpenFlowDriver(Driver):
         }
 
 if __name__ == "__main__":
+    BASE_DIR = os.path.dirname(__file__)
     driver = OpenFlowDriver(
         env={
-            "LOGS_PATH": "/home/eduardo/openflow/app2net/driver/openflow/logs",
-            "APPS_PATH": "/home/eduardo/openflow/app2net/driver/openflow",
+            "LOGS_PATH": os.path.join(BASE_DIR, "logs"),
+            "APPS_PATH": BASE_DIR
         }
     )
 
