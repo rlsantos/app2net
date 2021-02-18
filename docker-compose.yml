@@ -1,0 +1,28 @@
+services:
+  core:
+    build:
+      context: .
+      dockerfile: docker/core.dockerfile
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./app2net_core:/app2net_core/
+
+  repo:
+    build: 
+      context: .
+      dockerfile: docker/repo.dockerfile
+    volumes:
+      - ./static_repo:/repo/
+    ports: 
+      - 8000:8000
+
+  node-p4:
+    build:
+      context: .
+      dockerfile: docker/node-p4.dockerfile
+
+  node-openflow:
+    build:
+      context: .
+      dockerfile: docker/node-openflow.dockerfile
