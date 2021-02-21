@@ -1,12 +1,30 @@
 services:
-  core:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=app2net
+      - POSTGRES_DB=app2net
+    ports:
+      - 5432:5432
+
+  app2net_core:
     build:
       context: .
       dockerfile: docker/core.dockerfile
-    stdin_open: true
-    tty: true
     volumes:
       - ./app2net_core:/app2net_core/
+    ports:
+      - 8000:8000
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      - DB_PASSWORD=password
+      - DB_USER=app2net
+      - DB_NAME=app2net
+      - DB_HOST=db
+      - DB_PORT=5432
+    depends_on:
+      - db
 
   repo:
     build: 
@@ -15,7 +33,7 @@ services:
     volumes:
       - ./static_repo:/repo/
     ports: 
-      - 8000:8000
+      - 3333:3333
 
   node-p4:
     build:
