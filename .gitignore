@@ -112,3 +112,6 @@ venv.bak/
 # Env
 env.sqlite
 env.sqlite3
+
+# Annotation files
+*.ignore.*
