@@ -8,7 +8,11 @@ class NodeNotifier:
         self.port = port
 
     async def send_message(self, message: dict):
-        reader, writer = await asyncio.open_connection(self.host, self.port)
+        try:
+            reader, writer = await asyncio.open_connection(self.host, self.port)
+
+        except ConnectionRefusedError:
+            raise ConnectionRefusedError("Cannot connect to driver")
 
         writer.write(json.dumps(message).encode())
         await writer.drain()
@@ -18,40 +22,62 @@ class NodeNotifier:
         writer.close()
         await writer.wait_closed()
 
-        return response.decode()
+        return json.loads(response.decode())
 
-    async def download(self, uri: str, netapp_identifier: str, hash: str, strategy: str):
+    def download(self, uri: str, netapp_identifier: str, hash: str, strategy: str):
         message = {}
         message["action"] = "download"
         message["uri"] = uri
         message["identifier"] = netapp_identifier
         message["hash"] = hash
         message["strategy"] = strategy
-        return await self.send_message(message)
 
-    async def remove(self, netapp_identifier: str):
+        return asyncio.run(self.send_message(message))
+
+    def remove(self, netapp_identifier: str):
         message = {}
         message["action"] = "remove"
         message["identifier"] = netapp_identifier
-        return await self.send_message(message)
+        return asyncio.run(self.send_message(message))
 
-    async def get_execution_data(self):
+    def get_execution_data(self):
         message = {}
         message["action"] = "data"
-        return await self.send_message(message)
+        return asyncio.run(self.send_message(message))
 
-    async def run_management_action(self, netapp_identifier: str, command: str, 
-                                    native_procedure: bool = False):
+    def run_management_action(self, netapp_identifier: str, command: str,
+                              native_procedure: bool = False):
         message = {}
         message["action"] = "management"
         message["identifier"] = netapp_identifier
         message["command"] = command
         message["native_procedure"] = native_procedure
-        return await self.send_message(message)
+        return asyncio.run(self.send_message(message))
+
+
+def get_nodes_info(nodes):
+    info = {}
+    for node in nodes:
+        connection = node.connect()
+        info[nodes.id] = connection.get_execution_data()
+    return info
+
+
+def transfer_netapp(compatible_nodes, nacr, transfer_guidelines):
+    """Transfer NetApp files to compatile nodes"""
+    notify_nodes_and_repository(compatible_nodes, nacr, transfer_guidelines)
+    # Transfer guidelines passed in this call while
+    # notify_nodes_and_repository is not implemented
+    nacr.run_transfers(compatible_nodes, transfer_guidelines)
+
+
+def notify_nodes_and_repository(compatible_nodes, nacr, transfer_guidelines):
+    """Send transfer guidelines to nodes and the repository"""
+    pass
 
 
 if __name__ == "__main__":
-    async def main():
+    def main():
         host = input("Host (default: localhost): ") or 'localhost'
         port = int(input("Port (default: 5555): ") or 5555)
 
@@ -71,23 +97,21 @@ if __name__ == "__main__":
                     identifier = input("Identifier: ")
                     hash = input("Package hash: ")
                     strategy = input("Strategy: ")
-                    print(await notifier.download(uri, identifier, hash, strategy))
+                    print(notifier.download(uri, identifier, hash, strategy))
 
                 elif message == "2":
                     identifier = input("Identifier: ")
-                    print(await notifier.remove(identifier))
+                    print(notifier.remove(identifier))
 
                 elif message == "3":
-                    print(await notifier.get_execution_data())
+                    print(notifier.get_execution_data())
 
                 elif message == "4":
                     identifier = input("NetApp Identifier: ")
-                    command  = input("Command: ")
+                    command = input("Command: ")
                     native_procedure = input("Native procedure? (Y/N)").upper() == "Y"
-                    print(await notifier.run_management_action(identifier, command, native_procedure))
+                    print(notifier.run_management_action(
+                        identifier, command, native_procedure))
 
         except KeyboardInterrupt:
             pass
-    
-    asyncio.run(main())
-
