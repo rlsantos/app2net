@@ -56,8 +56,7 @@ class NetworkServicePackage(models.Model):
     technology = models.ForeignKey(
         ProgrammableTechnology, on_delete=models.SET_NULL, null=True
     )
-    execution_environment = models.CharField(max_length=50)
-    type = models.CharField(max_length=6, choices=NetAppType.choices)
+    type = models.CharField(max_length=6, choices=NetAppType.choices, default=NetAppType.NETAPP)
     nacr = models.ForeignKey(Repository, on_delete=models.CASCADE,
                              related_name="network_services")
     requirements = models.ManyToManyField(Resource, blank=True)
