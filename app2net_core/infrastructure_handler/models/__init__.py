@@ -1,10 +1,10 @@
-from .address import *
-from .credential import *
-from .device import *
-from .driver import *
-from .installed_driver import *
-from .interface import *
-from .link import *
-from .programmable_technology import *
-from .pvn import *
-from .resource import *
+from .address import Address, AddressType
+from .credential import Credential, AccessType
+from .device import Device
+from .driver import Driver
+from .installed_driver import InstalledDriver
+from .interface import Interface
+from .link import Link, Internal, External
+from .programmable_technology import ProgrammableTechnology
+from .pvn import Pvn
+from .resource import Resource, ResourceType, Logical, Physical

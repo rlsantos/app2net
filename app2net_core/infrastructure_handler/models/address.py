@@ -11,3 +11,6 @@ class Address(models.Model):
     mask = models.PositiveSmallIntegerField(null=True, help_text='Insert the mask in the CIDR notation')
     address_type = models.ForeignKey(AddressType, on_delete=models.CASCADE, related_name="addresses")
     interface = models.ForeignKey(Interface, on_delete=models.CASCADE, related_name='addresses')
+
+    class Meta:
+        verbose_name_plural = "Addresses"
