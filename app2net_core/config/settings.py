@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'accounts',
     'infrastructure_handler.apps.InfrastructureHandlerConfig',
+    'netapp_manager',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
