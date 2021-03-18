@@ -1,9 +1,35 @@
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.safestring import mark_safe
+from django.db.models import TextChoices
 
-UNITIES = (
+
+class Units(TextChoices):
+    VERSION = ("Version", _("Version of Installed Software"))
+    QUANTITY = ("n", _("Quantity"))
+    KBPS = ("Kbps", _("Kilobits/s"))
+    KB = ("KB", _('KiloBytes'))
+    GHZ = ("GHz", _("GHz"))
+
+
+CONVERSION_FACTORS = {
+    "Mbps": 10**3,
+    "Gbps": 10**6,
+    "MB": 10**3,
+    "GB": 10**6,
+    "TB": 10**9,
+}
+
+
+UNITS = (
+    ("", _("Installed Software")),
+    ("n", _("Quantity")),
+    ("Gbps", _("Gigabits/s")),
+    ("Kbps", _("Kilobits/s")),
+    ("Mbps", _("Megabits/s")),
+    ("GB", _("GigaBytes")),
+    ("MB", _("MegaBytes")),
     ("KB", _('KiloBytes')),
-    ("GHZ", _("GHz")),
+    ("GHz", _("GHz")),
 )
 
 LINK_STATUS = (
