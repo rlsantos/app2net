@@ -1,5 +1,5 @@
 from django.db import models
-from constants import UNITS, LOGICAL_RESOURCE_STATUS, Units
+from constants import LOGICAL_RESOURCE_STATUS, Units
 
 
 class ResourceType(models.Model):

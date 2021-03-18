@@ -1,4 +1,4 @@
-from system_notifier.notification_exchanger import transfer_netapp, notify_nodes_and_repository
+from system_notifier.notification_exchanger import transfer_netapp
 
 from .package_installer import install_netapp
 import secrets
@@ -12,7 +12,7 @@ def trigger_transfer(nacr, location_flag, compatible_nodes, requirements, packag
         raise ConnectionError("NACR couldn't prove its identity")
 
     transfer_guidelines = nacr.define_transfer_guidelines("", compatible_nodes)
-    transfer_guidelines.network_service = package
+    transfer_guidelines.package = package
     transfer_netapp(compatible_nodes, nacr, transfer_guidelines)
     install_netapp(compatible_nodes, package)
 

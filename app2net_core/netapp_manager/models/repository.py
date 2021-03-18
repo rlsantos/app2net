@@ -2,6 +2,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from dataclasses import dataclass
 
+from netapp_manager.exceptions import TransferError
+
 
 def get_upload_url(filename, instance):
     return f"nacr_keys/{instance.address}/"
@@ -65,9 +67,11 @@ class Repository(models.Model):
         """
         for node in compatible_nodes:
             connection = node.connect()
-            connection.download(
+            response = connection.download(
                 transfer_guidelines.package.uri,
                 transfer_guidelines.package.network_service.identifier,
                 transfer_guidelines.package.hash,
                 transfer_guidelines.strategy
             )
+            if not response['success']:
+                raise TransferError(response["error"]['message'])

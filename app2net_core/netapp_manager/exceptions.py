@@ -1,0 +1,2 @@
+class TransferError(Exception):
+    pass

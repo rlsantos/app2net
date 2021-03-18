@@ -20,18 +20,6 @@ CONVERSION_FACTORS = {
 }
 
 
-UNITS = (
-    ("", _("Installed Software")),
-    ("n", _("Quantity")),
-    ("Gbps", _("Gigabits/s")),
-    ("Kbps", _("Kilobits/s")),
-    ("Mbps", _("Megabits/s")),
-    ("GB", _("GigaBytes")),
-    ("MB", _("MegaBytes")),
-    ("KB", _('KiloBytes')),
-    ("GHz", _("GHz")),
-)
-
 LINK_STATUS = (
     ("ESTABLISH", _("Established")),
     ("FAILED", _("Failed")),

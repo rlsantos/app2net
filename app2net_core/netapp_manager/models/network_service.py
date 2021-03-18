@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 import os
-
 from infrastructure_handler.models import Resource, ProgrammableTechnology
 
 from . import Repository
@@ -10,8 +9,15 @@ from . import Repository
 
 class NetworkService(models.Model):
     identifier = models.CharField(max_length=100)
+    version = models.CharField(max_length=30)
+
     developer = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, related_name="+")
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="+"
+    )
+
+    downloads = models.PositiveIntegerField(default=0, editable=False)
 
     class Meta:
         constraints = [
@@ -31,11 +37,15 @@ class NetworkService(models.Model):
 
 class NetworkServicePackage(models.Model):
     class LocationFlagChoices(models.TextChoices):
-        ingress = ("I", _("Ingress"))
-        egress = ("E", _("Egress"))
-        border = ("B", _("Border"))
-        custom = ("C", _("Custom"))
-        all = ("A", _("All"))
+        INGRESS = ("I", _("Ingress"))
+        EGRESS = ("E", _("Egress"))
+        BORDER = ("B", _("Border"))
+        CUSTOM = ("C", _("Custom"))
+        ALL = ("A", _("All"))
+
+    class NetAppType(models.TextChoices):
+        NETAPP = ("NetApp", _("NetApp"))
+        VNA = ("VNA", _("VNA"))
 
     network_service = models.ForeignKey(
         NetworkService,
@@ -44,7 +54,10 @@ class NetworkServicePackage(models.Model):
         verbose_name=_("Network Service"),
     )
     technology = models.ForeignKey(
-        ProgrammableTechnology, on_delete=models.SET_NULL, null=True)
+        ProgrammableTechnology, on_delete=models.SET_NULL, null=True
+    )
+    execution_environment = models.CharField(max_length=50)
+    type = models.CharField(max_length=6, choices=NetAppType.choices)
     nacr = models.ForeignKey(Repository, on_delete=models.CASCADE,
                              related_name="network_services")
     requirements = models.ManyToManyField(Resource, blank=True)

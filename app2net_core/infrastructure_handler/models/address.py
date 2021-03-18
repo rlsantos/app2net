@@ -5,6 +5,9 @@ from .interface import Interface
 class AddressType(models.Model):
     name = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.name
+
 
 class Address(models.Model):
     value = models.CharField(max_length=128)
@@ -14,3 +17,6 @@ class Address(models.Model):
 
     class Meta:
         verbose_name_plural = "Addresses"
+
+    def __str__(self):
+        return f"{self.value} ({self.interface})"

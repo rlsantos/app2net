@@ -10,15 +10,15 @@ class MessageServer(threading.Thread):
 
     Receive JSON messages and dispatch them to the node driver
     Each message must have an "action" key and other parameters according it
-    
+
     Examples:
         - As Context Manager (recommended)::
 
             with MessageServer("", 5555, Driver()) as server:
                 server.run()
-        
+
         - Simple Usage::
-    
+
             server = MessageServer("", 5555, Driver())
             server.run()
             # Keep the server thread running while needed. 
@@ -75,16 +75,18 @@ class MessageServer(threading.Thread):
             }
             try:
                 if data["action"] == "download":
-                    self.driver.download(data["identifier"], data["uri"], data["strategy"], data["hash"])
+                    self.driver.download(data["identifier"],
+                                         data["uri"], data["strategy"], data["hash"])
                 elif data["action"] == "remove":
                     self.driver.remove(data["identifier"])
                 elif data["action"] == "management":
-                    output = self.driver.run_management_action(data["identifier"], data["command"], data["native_procedure"])
+                    output = self.driver.run_management_action(
+                        data["identifier"], data["command"], data["native_procedure"])
                     if output is not None:
-                         response = output
+                        response = output
                 elif data["action"] == "data":
                     response["data"] = self.driver.get_execution_data()
             except Exception as e:
-                response["error"] = f'{type(e).__name__}: {str(e)}'
+                response["error"] = {"type": type(e).__name__, "message": str(e)}
                 response["success"] = False
             conn.send(json.dumps(response).encode())
