@@ -9,11 +9,7 @@ class Driver(models.Model):
     version = models.CharField(max_length=20)
     status = models.CharField(max_length=20, choices=DRIVER_STATUS, default='active')
     package = models.FileField(null=True)
-<<<<<<< Updated upstream
     technology = models.ForeignKey(ProgrammableTechnology, on_delete=models.CASCADE, null=True)
-=======
-    technology = models.ForeignKey(ProgrammableTechnology, on_delete=models.CASCADE)
->>>>>>> Stashed changes
     execution_environments = models.ManyToManyField(ExecutionEnvironment)
 
     def __str__(self):
