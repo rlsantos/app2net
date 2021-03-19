@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import Subquery, OuterRef
 from django.db.models.functions import Cast
 from constants import DEVICE_STATUS, Units
+from infrastructure_handler.models import ExecutionEnvironment
 from system_notifier.notification_exchanger import NodeNotifier
 
 from .pvn import Pvn
@@ -48,6 +49,9 @@ class Device(models.Model):
                                          related_name="devices")
     programmable_technologies = models.ManyToManyField(
         ProgrammableTechnology, verbose_name='Available Programmable Technologies')
+    execution_environments = models.ManyToManyField(
+        ExecutionEnvironment, verbose_name="Available execution environments"
+    )
 
     objects = DeviceQuerySet.as_manager()
 
@@ -60,7 +64,11 @@ class Device(models.Model):
         Arguments:
             driver (Driver): Driver to be installed on device
             port (int): Port that the driver daemon will listen
+        
+        ToDo:
+            Real Implementation
         """
+        # Dummy code
         connection = self.credentials.filter(uploadable=True).first().connect()
         connection.run(driver.install_command)
         connection.run(driver.up_command.format(port))
@@ -71,6 +79,11 @@ class Device(models.Model):
         )
 
     def connect(self):
+        """Open a connection to the device
+
+        ToDo:
+            Make port dynamic
+        """
         return NodeNotifier(
             self.interfaces.first().addresses.first().value,
             5555

@@ -2,7 +2,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 import os
-from infrastructure_handler.models import Resource, ProgrammableTechnology
+from infrastructure_handler.models import (
+    Resource, ProgrammableTechnology, ExecutionEnvironment)
 
 from . import Repository
 
@@ -49,7 +50,13 @@ class NetworkService(models.Model):
 
     def get_info(self, technology):
         package = self.packages.get(technology=technology)
-        return package.requirements.all(), package.nacr, package.location_flag
+        # Merging querysets
+        requirements = (
+            package.requirements.all() |
+            package.execution_environment.requirements.all()
+        )
+        return (requirements.most_restrictive(), 
+                package.nacr, package.location_flag)
 
 
 class NetworkServicePackage(models.Model):
@@ -73,7 +80,11 @@ class NetworkServicePackage(models.Model):
     technology = models.ForeignKey(
         ProgrammableTechnology, on_delete=models.SET_NULL, null=True
     )
-    type = models.CharField(max_length=6, choices=NetAppType.choices, default=NetAppType.NETAPP)
+    type = models.CharField(max_length=6, choices=NetAppType.choices,
+                            default=NetAppType.NETAPP)
+    execution_environment = models.ForeignKey(
+        ExecutionEnvironment, on_delete=models.SET_NULL, null=True
+    )
     nacr = models.ForeignKey(Repository, on_delete=models.CASCADE,
                              related_name="network_services")
     requirements = models.ManyToManyField(Resource, blank=True)
