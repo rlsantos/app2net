@@ -2,7 +2,9 @@ from django.db import models
 from django.db.models import Subquery, OuterRef
 from django.db.models.functions import Cast
 from constants import DEVICE_STATUS, Units
+
 from infrastructure_handler.models import ExecutionEnvironment
+
 from system_notifier.notification_exchanger import NodeNotifier
 
 from .pvn import Pvn
