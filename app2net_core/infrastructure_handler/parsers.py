@@ -1,20 +1,8 @@
+from datetime import datetime
 from xml.etree import ElementTree
-import datetime
 
 
-# Parser deve utilizar VXDL puro ou a extensão que o Aurora utiliza? (ex: tag controllerList)
-# Implementar todas as tags vxdl? (ex: software list)
-
-class VxdlParser:
-    def __init__(self):
-        self.file = None
-
-    @staticmethod
-    def parse(file):
-        raise NotImplementedError
-
-
-class VxdlXmlParser(VxdlParser):
+class VxdlXmlParser:
     @classmethod
     def parse(cls, file):
         virtual_infrastructure = {}
@@ -24,8 +12,7 @@ class VxdlXmlParser(VxdlParser):
 
         virtual_infrastructure["id"] = root.attrib["id"]
         virtual_infrastructure["owner"] = root.attrib["owner"]
-        virtual_infrastructure["start_date"] = datetime.datetime.fromisoformat(
-            root.find("startDate").text)
+        virtual_infrastructure["start_date"] = datetime.fromisoformat(root.find("startDate").text)
 
         nodes = root.findall("vNode")
         links = root.findall("vLink")
@@ -81,16 +68,15 @@ class VxdlXmlParser(VxdlParser):
 
     @staticmethod
     def _parse_resource_parameter(parameter_node):
-        parameter = {}
         if parameter_node.find("interval"):
-            parameter.update({
+            parameter = {
                 "min": parameter_node.findtext("interval/min"),
                 "max": parameter_node.findtext("interval/max"),
-            })
+            }
         else:
-            parameter.update({
+            parameter = {
                 "value": parameter_node.findtext("simple")
-            })
+            }
 
         parameter["unit"] = parameter_node.find("unit").text
 

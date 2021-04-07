@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from dataclasses import dataclass
+import uuid
 
 from netapp_manager.exceptions import TransferError
 
@@ -22,6 +23,7 @@ class TransferGuidelines:
 
 
 class Repository(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     address = models.CharField(max_length=300)
     public_key = models.FileField(upload_to='nacr_keys/', null=True, blank=True)
 

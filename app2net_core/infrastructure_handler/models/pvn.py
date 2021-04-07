@@ -1,11 +1,15 @@
-from django.db import models, transaction
+from django.db import models
 from django.contrib.auth import get_user_model
+
+from uuid import uuid4
+
 from .driver import Driver
 
 
 class Pvn(models.Model):
+    id = models.UUIDField(editable=False, default=uuid4, primary_key=True)
     name = models.CharField(max_length=100)
-    owner = models.ManyToManyField(get_user_model(), verbose_name="PVN Owner", related_name="pvns")
+    owners = models.ManyToManyField(get_user_model(), verbose_name="PVN Owner", related_name="pvns")
 
     def __str__(self):
         return f"{self.name}"
@@ -24,4 +28,16 @@ class Pvn(models.Model):
         pass
 
     def get_info(self):
-        pass
+        return PvnInfo(self)
+
+
+class PvnInfo:
+    def __init__(self, pvn, technology=None, network_service=None):
+        self.pvn = pvn
+
+        self.technologies = pvn.devices.values('programmable_technologies').distinct()
+
+        if technology is not None and technology in self.technologies:
+            self.technologies = self.technologies.get(id=technology.id)
+
+        self.devices = pvn.devices.filter(programmable_technologies__in=self.technologies)

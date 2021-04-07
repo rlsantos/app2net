@@ -9,7 +9,7 @@ class MessageServer(threading.Thread):
     """Handle message exchanges with nodes through network
 
     Receive JSON messages and dispatch them to the node driver
-    Each message must have an "action" key and other parameters according it
+    Each message must have an "action" key and other parameters according to it
 
     Examples:
         - As Context Manager (recommended)::

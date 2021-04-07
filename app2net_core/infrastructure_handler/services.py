@@ -1,8 +1,6 @@
 from django.db import transaction
 from infrastructure_handler.models.interface import Interface
 from infrastructure_handler.models.link import Internal
-from system_notifier.notification_exchanger import get_nodes_info
-from collections import namedtuple
 
 from constants import CONVERSION_FACTORS, Units
 
@@ -14,6 +12,7 @@ from .parsers import VxdlXmlParser
 def configure_nodes(vxdl, owner):
     pvn = _create_pvn(vxdl, owner)
     print(pvn)
+    return pvn
     # pvn.install_drivers()
     #nodes_info = get_nodes_info()
     # save_data(nodes_info)
@@ -24,7 +23,7 @@ def _create_pvn(vxdl, owner) -> Pvn:
     nodes = data["nodes"]
 
     pvn = Pvn.objects.create(name=data["id"])
-    pvn.owner.add(owner)
+    pvn.owners.add(owner)
 
     devices = []
     resources = []
@@ -157,8 +156,4 @@ def _normalize_unit(value, original_unit):
 
 
 def _get_compatible_driver(node):
-    pass
-
-
-def get_pvn_info(pvn):
     pass

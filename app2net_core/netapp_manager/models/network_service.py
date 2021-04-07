@@ -7,17 +7,30 @@ from infrastructure_handler.models import Resource, ProgrammableTechnology
 from . import Repository
 
 
+def get_nad_upload_path(instance, filename):
+    return f"nad/{instance.developer}/{instance.identifier}.nad"
+
+
+class NetworkServiceManager(models.Manager):
+    def create_from_nad(self, nad_file):
+        pass
+
+
 class NetworkService(models.Model):
-    identifier = models.CharField(max_length=100)
-    version = models.CharField(max_length=30)
+    identifier = models.SlugField(max_length=100, blank=True)
+    version = models.CharField(max_length=30, blank=True)
 
     developer = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="+"
+        related_name="+",
+        blank=True
     )
 
     downloads = models.PositiveIntegerField(default=0, editable=False)
+    nad_file = models.FileField(upload_to=get_nad_upload_path, null=True, blank=True)
+
+    objects = NetworkServiceManager()
 
     class Meta:
         constraints = [
@@ -29,6 +42,10 @@ class NetworkService(models.Model):
 
     def __str__(self):
         return f"{self.developer}.{self.identifier}"
+
+    @property
+    def complete_identifier(self):
+        return str(self)
 
     def get_info(self, technology):
         package = self.packages.get(technology=technology)
