@@ -11,11 +11,7 @@ from .parsers import VxdlXmlParser
 @transaction.atomic
 def configure_nodes(vxdl, owner):
     pvn = _create_pvn(vxdl, owner)
-    print(pvn)
     return pvn
-    # pvn.install_drivers()
-    #nodes_info = get_nodes_info()
-    # save_data(nodes_info)
 
 
 def _create_pvn(vxdl, owner) -> Pvn:
@@ -66,8 +62,6 @@ def _create_pvn(vxdl, owner) -> Pvn:
         ]
 
         for software in node["software_list"]:
-            print(software)
-
             device_resources.append(
                 Resource.objects.get_or_create(
                     name=software["name"],

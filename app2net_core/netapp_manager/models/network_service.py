@@ -1,11 +1,13 @@
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
+from xml.etree import ElementTree
 import os
 
 from infrastructure_handler.models import Resource, ProgrammableTechnology, ExecutionEnvironment
 
-from . import Repository
+from .repository import Repository
+from .category import Category
 
 
 def get_nad_upload_path(instance, filename):
@@ -13,8 +15,50 @@ def get_nad_upload_path(instance, filename):
 
 
 class NetworkServiceManager(models.Manager):
-    def create_from_nad(self, nad_file):
-        pass
+    @transaction.atomic
+    def create_from_nad(self, nad_file, developer):
+        parsed_data = ElementTree.parse(nad_file)
+
+        root = parsed_data.getroot()
+
+        identifier = root.find("identifier").text
+        categories = root.findall("categories/category")
+        packages = root.findall("packages/technology")
+
+        network_service = self.create(
+            identifier=identifier, 
+            nad_file=nad_file, 
+            developer=developer
+        )
+
+        categories_objs = [Category.objects.get_or_create(name=category.text)[0] for category in categories]
+
+        network_service.categories.set(categories_objs)
+
+        for package in packages:
+            pkg_technology = ProgrammableTechnology.objects.get(
+                name=package.find('identifier').text
+            )
+            pkg_ee = ExecutionEnvironment.objects.get(
+                programmable_technology=pkg_technology, 
+                name=package.find('ee').text
+            )
+            pkg_version = package.find('version').text
+            pkg_type = package.find('type').text
+            pkg_uri = package.find('location/uri').text
+            pkg_hash = package.find('hash')
+            pkg_location_flag = package.find('location_flag')
+
+            package_obj = NetworkServicePackage.objects.create(
+                network_service=network_service,
+                technology=pkg_technology,
+                execution_environment=pkg_ee,
+                type=pkg_type, #How to make this?
+            )
+            pkg_actions = package.find('manage_actions')
+
+        
+        print(identifier, categories, packages)
 
 
 class NetworkService(models.Model):
@@ -27,10 +71,12 @@ class NetworkService(models.Model):
         related_name="+",
         blank=True
     )
+    categories = models.ManyToManyField(
+        Category, related_name="network_services")
 
     downloads = models.PositiveIntegerField(default=0, editable=False)
     nad_file = models.FileField(upload_to=get_nad_upload_path, null=True, blank=True)
-
+    conflicts = models.ManyToManyField('self')
     objects = NetworkServiceManager()
 
     class Meta:
@@ -77,9 +123,6 @@ class NetworkServicePackage(models.Model):
         related_name="packages",
         verbose_name=_("Network Service"),
     )
-    technology = models.ForeignKey(
-        ProgrammableTechnology, on_delete=models.SET_NULL, null=True
-    )
     type = models.CharField(max_length=6, choices=NetAppType.choices,
                             default=NetAppType.NETAPP)
     execution_environment = models.ForeignKey(
@@ -87,7 +130,6 @@ class NetworkServicePackage(models.Model):
     )
     nacr = models.ForeignKey(Repository, on_delete=models.CASCADE,
                              related_name="network_services")
-    requirements = models.ManyToManyField(Resource, blank=True)
     location_flag = models.CharField(max_length=1, choices=LocationFlagChoices.choices)
     file_path = models.CharField(max_length=500)
     hash = models.CharField(max_length=100)

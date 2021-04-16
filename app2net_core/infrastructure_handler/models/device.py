@@ -3,7 +3,6 @@ from django.db.models import Subquery, OuterRef
 from django.db.models.functions import Cast
 from constants import DEVICE_STATUS, Units
 
-from infrastructure_handler.models import ExecutionEnvironment
 
 from system_notifier.notification_exchanger import NodeNotifier
 
@@ -12,6 +11,7 @@ from .driver import Driver
 from .resource import Resource
 from .credential import Credential
 from .programmable_technology import ProgrammableTechnology
+from . execution_environment import ExecutionEnvironment
 
 
 class DeviceQuerySet(models.QuerySet):
@@ -49,8 +49,6 @@ class Device(models.Model):
                                        related_name="devices")
     credentials = models.ManyToManyField(Credential, verbose_name='Available Credentials',
                                          related_name="devices")
-    programmable_technologies = models.ManyToManyField(
-        ProgrammableTechnology, verbose_name='Available Programmable Technologies')
     execution_environments = models.ManyToManyField(
         ExecutionEnvironment, verbose_name="Available execution environments"
     )

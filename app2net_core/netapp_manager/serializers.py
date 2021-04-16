@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+from django.core.validators import FileExtensionValidator
 from . import models
 
 
@@ -36,3 +36,14 @@ class NetworkServiceSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return models.NetworkService.objects.create_from_nad(validated_data["nad_file"])
+
+
+class NetworkServiceNadSerializer(serializers.ModelSerializer):
+    nad = serializers.FileField(validators=[FileExtensionValidator(['nad'])])
+
+    class Meta:
+        model = models.NetworkService
+        fields = ['nad']
+    
+    def create(self, validated_data):
+        return models.NetworkService.objects.create_from_nad(validated_data["nad"], validated_data["developer"])

@@ -16,10 +16,9 @@ app_name = 'v1'
 
 urlpatterns = [
     path('auth/', ObtainAuthToken.as_view(), name="get_auth_token"),
-
-    path('network_services/', nm_views.NetworkServiceListView.as_view(), name="network_services__list"),
+    path('network_services/', nm_views.NetworkServiceListCreateView.as_view(), name="network_services__list"),
     path('network_services/<str:developer>/',
-         nm_views.NetworkServiceListView.as_view(),
+         nm_views.NetworkServiceListCreateView.as_view(),
          name="network_services__developer__list"),
     path('network_services/<str:developer>/<str:identifier>/',
          nm_views.NetworkServiceDetailView.as_view(),

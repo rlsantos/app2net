@@ -10,7 +10,7 @@ class Driver(models.Model):
     status = models.CharField(max_length=20, choices=DRIVER_STATUS, default='active')
     package = models.FileField(null=True)
     technology = models.ForeignKey(ProgrammableTechnology, on_delete=models.CASCADE, null=True)
-    execution_environments = models.ManyToManyField(ExecutionEnvironment)
+    execution_environments = models.ManyToManyField(ExecutionEnvironment, related_name='drivers')
 
     def __str__(self):
         return f"{self.name} {self.version} ({self.status})"

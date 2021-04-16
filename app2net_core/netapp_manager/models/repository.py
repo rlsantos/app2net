@@ -19,7 +19,7 @@ class TransferGuidelines:
         network_service (NetworkServicePackage): Network service to be transfered
     """
     strategy: str
-    package: 'NetworkServicePackage' = None
+    package: 'NetworkServicePackage' = None # type:ignore
 
 
 class Repository(models.Model):

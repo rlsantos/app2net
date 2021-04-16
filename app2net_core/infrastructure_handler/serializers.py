@@ -24,7 +24,7 @@ class DeviceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Device
-        fields = ['name', 'status', 'create_date', 'update_date', "drivers", "resources", "programmable_technologies"]
+        fields = ['name', 'status', 'create_date', 'update_date', "drivers", "resources"]
         depth = 5
 
 

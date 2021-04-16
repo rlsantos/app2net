@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<network_service>
 <identifier>p4_load_balance</identifier> <!--TAG NOVA: Identificador do netapp-->
 <categories>
     <category>load_balancing</category>
@@ -39,3 +40,4 @@
         </manage_actions>
     </technology>
 </packages>
+</network_service>

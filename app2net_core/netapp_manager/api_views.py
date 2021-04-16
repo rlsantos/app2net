@@ -6,10 +6,10 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
 from infrastructure_handler.models import Pvn
-from .serializers import RepositorySerializer, NetworkServiceSerializer
+from .serializers import NetworkServiceNadSerializer, RepositorySerializer, NetworkServiceSerializer
 from .models import Repository, NetworkService
 from .services.node_selector import define_compatible_nodes
-
+from .forms import NADFileForm
 
 
 class RepositoryViewSet(ModelViewSet):
@@ -17,17 +17,26 @@ class RepositoryViewSet(ModelViewSet):
     queryset = Repository.objects.all()
 
 
-class NetworkServiceListView(generics.ListAPIView):
-    serializer_class = NetworkServiceSerializer
+class NetworkServiceListCreateView(generics.ListCreateAPIView):
     queryset = NetworkService.objects.all()
     lookup_url_kwarg = 'developer'
     lookup_field = 'developer'
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return NetworkServiceSerializer
+        else:
+            return NetworkServiceNadSerializer
 
     def get_queryset(self):
         qs = super().get_queryset()
         if self.kwargs:
             return qs.filter(developer__username=self.kwargs['developer'])
         return qs
+    
+    def perform_create(self, serializer):
+        return serializer.save(developer=self.request.user)
 
 
 class NetworkServiceDetailView(generics.RetrieveAPIView):
@@ -39,6 +48,14 @@ class NetworkServiceDetailView(generics.RetrieveAPIView):
             developer__username=self.kwargs["developer"],
             identifier=self.kwargs["identifier"]
         )
+
+
+class NetworkServiceCreateView(generics.CreateAPIView):
+    serializer_class = NetworkServiceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer): 
+        serializer.save(developer=self.request.user)
 
 
 class DeployNetworkService(views.APIView):
