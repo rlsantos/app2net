@@ -42,10 +42,11 @@ class VxdlXmlParser:
         for interface_node in interface_nodes:
             interfaces.append({
                 "alias": interface_node.find("alias").text,
-                "type": interface_node.find("type").text
+                "type": interface_node.find("type").text,
+                "anchor": interface_node.findtext("anchor")
             })
 
-        software_nodes = node_element.findall("software_list/software")
+        software_nodes = node_element.findall("softwares/software")
 
         if software_nodes:
             software_list = [

@@ -4,7 +4,7 @@ from infrastructure_handler.models.link import Internal
 
 from constants import CONVERSION_FACTORS, Units
 
-from .models import Device, Pvn, Link, Resource, ResourceType
+from .models import Device, Pvn, Link, Resource, ResourceType, Address, AddressType
 from .parsers import VxdlXmlParser
 
 
@@ -24,6 +24,7 @@ def _create_pvn(vxdl, owner) -> Pvn:
     devices = []
     resources = []
     interfaces = []
+    addresses = []
 
     for node in nodes:
         device_resources = [
@@ -60,8 +61,9 @@ def _create_pvn(vxdl, owner) -> Pvn:
                 )[0]
             )[0],
         ]
-
+        print(node["software_list"])
         for software in node["software_list"]:
+            print(software)
             device_resources.append(
                 Resource.objects.get_or_create(
                     name=software["name"],
@@ -78,10 +80,22 @@ def _create_pvn(vxdl, owner) -> Pvn:
         device_interfaces = []
 
         for interface in node["interfaces"]:
-            device_interfaces.append(Interface(
+            interface_obj = Interface(
                 name=interface["alias"]
-            ))
+            )
 
+            if interface["anchor"]:
+                addresses.append(
+                    Address(
+                        address_type=AddressType.objects.get_or_create(name="interface")[0],
+                        mask=1234, # ToDO: Dynamic mask and types,
+                        value=interface["anchor"]
+                    )
+                )
+            else:
+                addresses.append(None)
+
+            device_interfaces.append(interface_obj)
         interfaces.append(device_interfaces)
 
         devices.append(
@@ -94,6 +108,7 @@ def _create_pvn(vxdl, owner) -> Pvn:
     devices_objects = Device.objects.bulk_create(devices)
     resource_objects = []
     interface_objects = []
+    address_objects = []
 
     for idx, device in enumerate(devices_objects):
         for resource in resources[idx]:
@@ -105,7 +120,14 @@ def _create_pvn(vxdl, owner) -> Pvn:
             interface_objects.append(interface)
 
     Device.resources.through.objects.bulk_create(resource_objects)
-    Interface.objects.bulk_create(interface_objects)
+    interfaces = Interface.objects.bulk_create(interface_objects)
+    for idx, interface in enumerate(interfaces):
+        address = addresses[idx]
+        if address is not None:
+            address.interface = interface
+            address_objects.append(address)
+
+    Address.objects.bulk_create(address_objects)
 
     links = data["links"]
 

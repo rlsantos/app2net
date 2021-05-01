@@ -12,6 +12,7 @@ class ExecutionEnvironment(models.Model):
         on_delete=models.CASCADE, 
         related_name="execution_environments"
     )
+    version = models.CharField(max_length=30)
     requirements = models.ManyToManyField(
         Resource, 
         blank=True

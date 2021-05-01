@@ -35,9 +35,9 @@ class PvnInfo:
     def __init__(self, pvn, technology=None, network_service=None):
         self.pvn = pvn
 
-        self.technologies = pvn.devices.values('programmable_technologies').distinct()
-
+        self.technologies = pvn.devices.values('execution_environments').distinct()
+        print(self.technologies)
         if technology is not None and technology in self.technologies:
             self.technologies = self.technologies.get(id=technology.id)
 
-        self.devices = pvn.devices.filter(programmable_technologies__in=self.technologies)
+        self.devices = pvn.devices.filter(execution_environments__in=self.technologies)

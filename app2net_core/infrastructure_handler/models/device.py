@@ -10,8 +10,7 @@ from .pvn import Pvn
 from .driver import Driver
 from .resource import Resource
 from .credential import Credential
-from .programmable_technology import ProgrammableTechnology
-from . execution_environment import ExecutionEnvironment
+from .execution_environment import ExecutionEnvironment
 
 
 class DeviceQuerySet(models.QuerySet):
@@ -78,13 +77,19 @@ class Device(models.Model):
             port=port
         )
 
-    def connect(self):
+    def connect(self, ee=None):
         """Open a connection to the device
 
         ToDo:
             Make port dynamic
         """
+
+        if ee is None:
+            port = 5555
+        else:
+            port = self.drivers.through.filter(driver__execution_environment=ee).first().port
+
         return NodeNotifier(
             self.interfaces.first().addresses.first().value,
-            5555
+            port
         )
