@@ -2,6 +2,7 @@ import pexpect
 import time
 
 class RemoteConnection:
+    # ToDo: Make connection to install drivers
     def __init__(self, *commands):
         print("Running:", commands[0])
         a = self.connection = pexpect.spawn(commands[0])
