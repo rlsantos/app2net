@@ -7,9 +7,8 @@ from django.shortcuts import get_object_or_404
 
 from infrastructure_handler.models import Pvn
 from .serializers import NetworkServiceNadSerializer, RepositorySerializer, NetworkServiceSerializer
-from .models import Repository, NetworkService
+from .models import Repository, NetApp
 from .services.node_selector import define_compatible_nodes
-from .forms import NADFileForm
 
 
 class RepositoryViewSet(ModelViewSet):
@@ -18,7 +17,7 @@ class RepositoryViewSet(ModelViewSet):
 
 
 class NetworkServiceListCreateView(generics.ListCreateAPIView):
-    queryset = NetworkService.objects.all()
+    queryset = NetApp.objects.all()
     lookup_url_kwarg = 'developer'
     lookup_field = 'developer'
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -34,14 +33,14 @@ class NetworkServiceListCreateView(generics.ListCreateAPIView):
         if self.kwargs:
             return qs.filter(developer__username=self.kwargs['developer'])
         return qs
-    
+
     def perform_create(self, serializer):
-        return serializer.save(developer=self.request.user)
+        serializer.save(developer=self.request.user)
 
 
 class NetworkServiceDetailView(generics.RetrieveAPIView):
     serializer_class = NetworkServiceSerializer
-    queryset = NetworkService.objects.all()
+    queryset = NetApp.objects.all()
 
     def get_object(self):
         return self.queryset.get(
@@ -65,13 +64,13 @@ class DeployNetworkService(views.APIView):
         developer = self.kwargs["developer"]
         network_service_id = self.kwargs["identifier"]
 
-        network_service = NetworkService.objects.get(
+        network_service = NetApp.objects.get(
             developer__username=developer, identifier=network_service_id
         )
 
         pvn_info = get_object_or_404(Pvn,
             id=request.POST['pvn'],
-            owner=request.user,
+            owners=request.user,
         ).get_info()
 
         define_compatible_nodes(pvn_info, network_service)

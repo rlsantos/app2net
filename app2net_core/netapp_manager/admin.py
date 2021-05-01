@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Action, NetworkService, NetworkServicePackage, Repository
+from .models import Action, NetApp, NetAppPackage, Repository, Category
 
 
 class ActionInline(admin.StackedInline):
@@ -12,6 +12,7 @@ class NetworkServicePackageAdmin(admin.ModelAdmin):
     inlines = [ActionInline]
 
 
-admin.site.register(NetworkService)
-admin.site.register(NetworkServicePackage, NetworkServicePackageAdmin)
+admin.site.register(NetApp)
+admin.site.register(NetAppPackage, NetworkServicePackageAdmin)
 admin.site.register(Repository)
+admin.site.register(Category)

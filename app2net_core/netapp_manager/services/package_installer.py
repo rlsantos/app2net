@@ -5,7 +5,7 @@ def install_netapp(compatible_nodes, package):
     for node in compatible_nodes:
         install_action = package.actions.get(name='install')
         connection = node.connect()
-        connection.run_management_action(
+        output = connection.run_management_action(
             package.network_service.identifier,
             install_action.command,
             install_action.native_procedure
