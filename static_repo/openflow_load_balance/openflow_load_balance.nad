@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<nsd>
 <identifier>openflow_load_balance</identifier>
 <categories>
     <category>load_balancing</category>
@@ -56,3 +57,4 @@
         </manage_actions>
     </technology>
 </packages>
+</nsd>

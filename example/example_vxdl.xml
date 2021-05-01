@@ -7,12 +7,12 @@
                 <simple>1</simple>
             </cores>
             <frequency>
-                <simple>1.6<simple>
-                <unit>GHz<unit>
+                <simple>1.6</simple>
+                <unit>GHz</unit>
             </frequency>
         </cpu>
         <memory>
-            <simple>500<simple>
+            <simple>500</simple>
             <unit>MB</unit>
         </memory>
         <storage>
@@ -22,19 +22,12 @@
         <interface>
             <alias>net0</alias>
             <type>bridge</type>
+            <anchor>node-p4-1</anchor>
         </interface>
         <softwares>
             <software>
-                <name>simple_switch</name>
-                <version>
-                    <simple>1.14.0</simple>
-                </version>
-            </software>
-            <software>
                 <name>simple_switch_grpc</name>
-                <version>
-                    <simple>1.14.0</simple>
-                </version>
+                <version>1.14.0</version>
             </software>
             <software>
                 <name>p4c</name>
@@ -54,12 +47,12 @@
                 <simple>1</simple>
             </cores>
             <frequency>
-                <simple>1.6<simple>
-                <unit>GHz<unit>
+                <simple>1.6</simple>
+                <unit>GHz</unit>
             </frequency>
         </cpu>
         <memory>
-            <simple>500<simple>
+            <simple>500</simple>
             <unit>MB</unit>
         </memory>
         <storage>
@@ -69,19 +62,12 @@
         <interface>
             <alias>net0</alias>
             <type>bridge</type>
+            <anchor>node-p4-2</anchor>
         </interface>
         <softwares>
             <software>
                 <name>simple_switch</name>
-                <version>
-                    <simple>1.14.0</simple>
-                </version>
-            </software>
-            <software>
-                <name>simple_switch_grpc</name>
-                <version>
-                    <simple>1.14.0</simple>
-                </version>
+                <version>1.14.0</version>
             </software>
             <software>
                 <name>p4c</name>
@@ -101,12 +87,12 @@
                 <simple>1</simple>
             </cores>
             <frequency>
-                <simple>1.6<simple>
-                <unit>GHz<unit>
+                <simple>1.6</simple>
+                <unit>GHz</unit>
             </frequency>
         </cpu>
         <memory>
-            <simple>500<simple>
+            <simple>500</simple>
             <unit>MB</unit>
         </memory>
         <storage>
@@ -114,8 +100,9 @@
             <unit>MB</unit>
         </storage>
         <interface>
-            <alias>eth0</alias>
+            <alias>net0</alias>
             <type>bridge</type>
+            <anchor>node-openflow-1</anchor>
         </interface>
         <softwares>
             <software>

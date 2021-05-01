@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<network_service>
+<nsd>
 <identifier>p4_load_balance</identifier> <!--TAG NOVA: Identificador do netapp-->
 <categories>
     <category>load_balancing</category>
@@ -11,7 +11,7 @@
         <version>all</version>
         <type>netapp</type>
         <location>
-            <uri>file:///home/p4/app2net/static_repo/p4_load_balance/p4_load_balance.tar.gz</uri>
+            <uri>repo:3333/p4_load_balance/p4_load_balance.tar.gz</uri>
         </location>
         <hash>e7d8f4596f0341391dbbaee1eb9bffcd</hash>
         <location_flag>ingress</location_flag>
@@ -28,7 +28,7 @@
         <version>all</version>
         <type>netapp</type>
         <location>
-            <uri>file:///home/p4/app2net/static_repo/p4_load_balance/p4_load_balance.tar.gz</uri>
+            <uri>repo:3333/p4_load_balance/p4_load_balance.tar.gz</uri>
         </location>
         <hash>e7d8f4596f0341391dbbaee1eb9bffcd</hash>
         <location_flag>ingress</location_flag>
@@ -40,4 +40,4 @@
         </manage_actions>
     </technology>
 </packages>
-</network_service>
+</nsd>
